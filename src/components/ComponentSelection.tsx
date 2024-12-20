@@ -8,6 +8,16 @@ interface ComponentSelectionProps {
     ports: Record<string, number>;
   };
   setConfig: (config: any) => void;
+  serviceVersions: {
+    n8n: string;
+    ollama: string;
+    openwebui: string;
+    qdrant: string;
+    postgres: string;
+    flowise: string;
+    searxng: string;
+    perplexity: string;
+  };
 }
 
 const components = [
@@ -83,7 +93,8 @@ export const ComponentSelection: React.FC<ComponentSelectionProps> = ({
   selectedComponents,
   setSelectedComponents,
   config,
-  setConfig
+  setConfig,
+  serviceVersions
 }) => {
   const handleComponentToggle = (componentId: string) => {
     const component = components.find(c => c.id === componentId);
@@ -149,6 +160,9 @@ export const ComponentSelection: React.FC<ComponentSelectionProps> = ({
               <div className="flex-grow cursor-pointer" onClick={() => !isDisabled(component.id) && handleComponentToggle(component.id)}>
                 <div className="flex items-center">
                   <h3 className="font-medium">{component.name}</h3>
+                  <div className="ml-2 text-xs text-gray-500">
+                    v{serviceVersions[component.portKey.replace('Web', '').toLowerCase()]}
+                  </div>
                   <div className="ml-4">
                     {selectedComponents[component.id] ? (
                       <CheckCircle className="w-5 h-5 text-green-500" />

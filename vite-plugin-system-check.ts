@@ -43,6 +43,16 @@ interface DeploymentConfig {
       adminPassword: string;
     };
   };
+  serviceVersions: {
+    n8n: string;
+    ollama: string;
+    openwebui: string;
+    qdrant: string;
+    postgres: string;
+    flowise: string;
+    searxng: string;
+    perplexity: string;
+  };
 }
 
 function generateDockerCompose(config: DeploymentConfig): string {
@@ -52,7 +62,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['n8n']) {
     services.push(`
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:${config.serviceVersions.n8n}
     container_name: ai-n8n-1
     ports:
       - "${config.ports.n8n}:5678"
@@ -74,7 +84,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['Ollama']) {
     services.push(`
   ollama:
-    image: ollama/ollama
+    image: ollama/ollama:${config.serviceVersions.ollama}
     container_name: ai-ollama-1
     ports:
       - "${config.ports.ollama}:11434"
@@ -95,7 +105,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
     }
     services.push(`
   openwebui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:${config.serviceVersions.openwebui}
     container_name: ai-openwebui-1
     ports:
       - "${config.ports.ollamaWeb}:8080"
@@ -115,7 +125,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['Qdrant']) {
     services.push(`
   qdrant:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:${config.serviceVersions.qdrant}
     container_name: ai-qdrant-1
     ports:
       - "${config.ports.qdrant}:6333"
@@ -135,7 +145,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['PostgreSQL']) {
     services.push(`
   postgres:
-    image: postgres:latest
+    image: postgres:${config.serviceVersions.postgres}
     container_name: ai-postgres-1
     ports:
       - "${config.ports.postgres}:5432"
@@ -156,7 +166,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['Flowise']) {
     services.push(`
   flowise:
-    image: flowiseai/flowise:latest
+    image: flowiseai/flowise:${config.serviceVersions.flowise}
     container_name: ai-flowise-1
     ports:
       - "${config.ports.flowise}:3000"
@@ -177,7 +187,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['SearXNG']) {
     services.push(`
   searxng:
-    image: searxng/searxng:latest
+    image: searxng/searxng:${config.serviceVersions.searxng}
     container_name: ai-searxng-1
     ports:
       - "${config.ports.searxng}:8080"
@@ -206,7 +216,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
     }
     services.push(`
   perplexity:
-    image: ghcr.io/perplexity-ai/online-inference:latest
+    image: ghcr.io/perplexity-ai/online-inference:${config.serviceVersions.perplexity}
     container_name: ai-perplexity-1
     ports:
       - "${config.ports.perplexity}:3000"
@@ -337,7 +347,6 @@ RAM: ${config.ramGB}GB
 - SearXNG: https://docs.searxng.org/
 - Perplexity: https://perplexity.ai/docs
 `;
-}
 
 async function checkPortAvailable(port: number): Promise<boolean> {
   try {

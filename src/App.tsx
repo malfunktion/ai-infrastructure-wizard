@@ -4,6 +4,7 @@ import { WizardStep } from './components/WizardStep';
 import { NavigationButtons } from './components/NavigationButtons';
 import { StepIndicator } from './components/StepIndicator';
 import { Step } from './types/wizard';
+import { fetchServiceVersions } from './utils/versionFetcher';
 
 const steps: Step[] = [
   {
@@ -47,6 +48,17 @@ interface ServiceLink {
   name: string;
   url: string;
   description: string;
+}
+
+interface ServiceVersions {
+  n8n: string;
+  ollama: string;
+  openwebui: string;
+  qdrant: string;
+  postgres: string;
+  flowise: string;
+  searxng: string;
+  perplexity: string;
 }
 
 function App() {
@@ -103,6 +115,16 @@ function App() {
   const [deploymentStatus, setDeploymentStatus] = useState<string | null>(null);
   const [launchAfterDeploy, setLaunchAfterDeploy] = useState(true);
   const [servicesStatus, setServicesStatus] = useState<Record<string, boolean>>({});
+  const [serviceVersions, setServiceVersions] = useState<ServiceVersions>({
+    n8n: 'latest',
+    ollama: 'latest',
+    openwebui: 'latest',
+    qdrant: 'latest',
+    postgres: 'latest',
+    flowise: 'latest',
+    searxng: 'latest',
+    perplexity: 'latest'
+  });
 
   useEffect(() => {
     if (servicesStatus && Object.keys(servicesStatus).length > 0) {
@@ -159,6 +181,14 @@ function App() {
       setServiceLinks(links);
     }
   }, [servicesStatus, config]);
+
+  useEffect(() => {
+    const loadVersions = async () => {
+      const versions = await fetchServiceVersions();
+      setServiceVersions(versions);
+    };
+    loadVersions();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
