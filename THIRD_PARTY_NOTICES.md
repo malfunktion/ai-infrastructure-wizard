@@ -34,6 +34,12 @@ This project uses the following third-party software and Docker images. Each has
 - **Source Code**: [https://github.com/FlowiseAI/Flowise](https://github.com/FlowiseAI/Flowise)
 - **Documentation**: [https://docs.flowiseai.com/](https://docs.flowiseai.com/)
 
+### SearXNG
+- **Official Image**: [searxng/searxng](https://hub.docker.com/r/searxng/searxng)
+- **License**: [GNU Affero General Public License](https://github.com/searxng/searxng/blob/master/LICENSE)
+- **Source Code**: [https://github.com/searxng/searxng](https://github.com/searxng/searxng)
+- **Documentation**: [https://docs.searxng.org/](https://docs.searxng.org/)
+
 ## Development Dependencies
 
 ### React

@@ -59,7 +59,8 @@ function App() {
       ollamaWeb: 3000,
       qdrant: 6333,
       postgres: 5432,
-      flowise: 3001
+      flowise: 3001,
+      searxng: 8080
     },
     cpuCores: 4,
     ramGB: 8,
@@ -73,6 +74,7 @@ function App() {
     'Qdrant': true,
     'PostgreSQL': true,
     'Flowise': false,
+    'SearXNG': true,
   });
   const [serviceLinks, setServiceLinks] = useState<ServiceLink[]>([]);
   const [isDeploying, setIsDeploying] = useState(false);
@@ -116,6 +118,13 @@ function App() {
           name: 'Flowise',
           url: `http://localhost:${config.ports.flowise}`,
           description: 'LLM Flow Builder'
+        });
+      }
+      if (servicesStatus['SearXNG']) {
+        links.push({
+          name: 'SearXNG',
+          url: `http://localhost:${config.ports.searxng}`,
+          description: 'Decentralized Search Engine'
         });
       }
       setServiceLinks(links);
@@ -210,6 +219,21 @@ function App() {
               onChange={(e) => setConfig({
                 ...config,
                 ports: { ...config.ports, flowise: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+
+        {selectedComponents['SearXNG'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">SearXNG Port</label>
+            <input
+              type="number"
+              value={config.ports.searxng}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, searxng: parseInt(e.target.value) }
               })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />

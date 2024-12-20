@@ -15,6 +15,7 @@ interface DeploymentConfig {
     qdrant: number;
     postgres: number;
     flowise: number;
+    searxng: number;
   };
   cpuCores: number;
   ramGB: number;
@@ -147,12 +148,35 @@ function generateDockerCompose(config: DeploymentConfig): string {
           memory: ${config.ramGB}G`);
   }
 
+  if (config.selectedComponents['SearXNG']) {
+    services.push(`
+  searxng:
+    image: searxng/searxng
+    container_name: ai-searxng-1
+    ports:
+      - "${config.ports.searxng}:8080"
+    volumes:
+      - searxng_data:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:${config.ports.searxng}/
+      - SEARXNG_HOSTNAME=ai-searxng-1
+      - SEARXNG_SECRET=${config.adminPassword}
+    networks:
+      - ai-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G`);
+  }
+
   const volumes = [
     'n8n_data',
     'ollama_data',
     'qdrant_data',
     'postgres_data',
-    'flowise_data'
+    'flowise_data',
+    'searxng_data'
   ].filter(volume => {
     const serviceName = volume.split('_')[0];
     return config.selectedComponents[serviceName === 'n8n' ? 'n8n' : serviceName.charAt(0).toUpperCase() + serviceName.slice(1)];
@@ -184,6 +208,7 @@ OLLAMA_WEB_PORT=${config.ports.ollamaWeb}
 QDRANT_PORT=${config.ports.qdrant}
 POSTGRES_PORT=${config.ports.postgres}
 FLOWISE_PORT=${config.ports.flowise}
+SEARXNG_PORT=${config.ports.searxng}
 
 # Resource Limits
 CPU_CORES=${config.cpuCores}
@@ -207,6 +232,9 @@ function generateReadme(config: DeploymentConfig): string {
   }
   if (config.selectedComponents['Flowise']) {
     services.push(`- Flowise: http://localhost:${config.ports.flowise}`);
+  }
+  if (config.selectedComponents['SearXNG']) {
+    services.push(`- SearXNG: http://localhost:${config.ports.searxng}`);
   }
 
   return `# AI Infrastructure Setup
@@ -244,7 +272,9 @@ RAM: ${config.ramGB}GB
 - Ollama: https://ollama.ai/docs
 - Qdrant: https://qdrant.tech/documentation/
 - PostgreSQL: https://www.postgresql.org/docs/
-- Flowise: https://docs.flowiseai.com/`;
+- Flowise: https://docs.flowiseai.com/
+- SearXNG: https://docs.searxng.org/
+`;
 }
 
 async function checkPortAvailable(port: number): Promise<boolean> {
@@ -283,6 +313,9 @@ async function validateConfiguration(config: DeploymentConfig): Promise<{ valid:
   }
   if (config.selectedComponents['Flowise']) {
     requiredPorts.push([config.ports.flowise, 'Flowise']);
+  }
+  if (config.selectedComponents['SearXNG']) {
+    requiredPorts.push([config.ports.searxng, 'SearXNG']);
   }
 
   // Check for port conflicts
