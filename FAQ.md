@@ -2,146 +2,131 @@
 
 ## General Questions
 
-### Q: What is AI Infrastructure Wizard?
-A: AI Infrastructure Wizard is a tool that helps you set up and manage various AI-related services using Docker containers. It provides a user-friendly interface to configure and deploy services like n8n, Ollama, Qdrant, and more.
+### What is the AI Infrastructure Wizard?
+The AI Infrastructure Wizard is a desktop application that helps you deploy and configure AI-related services using Docker containers. It provides a user-friendly interface to set up PostgreSQL, Flowise, and Qdrant.
 
-### Q: Is it free to use?
-A: Yes, AI Infrastructure Wizard is open-source and free to use under the MIT license.
+### Do I need technical knowledge to use this?
+Basic familiarity with Docker is helpful, but the wizard is designed to be user-friendly and guides you through the setup process step by step.
 
-### Q: What operating systems are supported?
-A: The wizard supports Windows, macOS, and Linux operating systems. However, some features may require specific OS configurations.
+### Which operating systems are supported?
+The wizard supports Windows, macOS, and Linux operating systems. You need to have Docker and Docker Compose installed.
 
-## Installation & Setup
+## Installation
 
-### Q: What are the minimum system requirements?
-A: The minimum requirements are:
-- 2 CPU cores
-- 4GB RAM
-- 10GB free disk space
-- Docker Desktop
-- Node.js 18+
+### What are the system requirements?
+- Node.js 16 or higher
+- Docker and Docker Compose
+- Sufficient disk space for data storage
+- Available ports: 5432 (PostgreSQL), 3000 (Flowise), 6333/6334 (Qdrant)
 
-### Q: Do I need a GPU?
-A: No, a GPU is not required but is recommended for better performance with LLM services like Ollama.
+### How do I install Docker?
+Visit [Docker's official website](https://www.docker.com/products/docker-desktop) to download and install Docker Desktop for your operating system.
 
-### Q: Can I change the installation directory later?
-A: Yes, you can run the wizard again to create a new installation. However, you'll need to manually migrate any data from the old installation.
+### Can I change the installation directory?
+Yes, the wizard allows you to choose any directory for installation. Make sure you have write permissions for the chosen directory.
 
-## Components & Services
+## Components
 
-### Q: What services are included?
-A: The core services are:
-- n8n (workflow automation)
-- Ollama (local LLM runner)
-- Qdrant (vector database)
-- PostgreSQL (relational database)
-Optional services:
-- Flowise (LLM flow builder)
-- Perplexica (AI chat interface)
+### What components are available?
+Currently, the wizard supports:
+- PostgreSQL (Relational Database)
+- Flowise (LLM Flow Builder)
+- Qdrant (Vector Database)
 
-### Q: Can I add my own services?
-A: Currently, the wizard supports a predefined set of services. Custom service integration is planned for future releases.
+### Can I install only specific components?
+Yes, you can choose which components to install. The wizard will generate a docker-compose.yml file only for the selected components.
 
-### Q: How do I access the services?
-A: Each service is accessible via its web interface:
-- n8n: http://localhost:5678
-- Flowise: http://localhost:3000
-- Qdrant: http://localhost:6333
-- Perplexica: http://localhost:3001
+### How are the components secured?
+- PostgreSQL: Username/password authentication
+- Flowise: Username/password authentication
+- Qdrant: Optional API key authentication
 
-## Resource Usage
+## Data Management
 
-### Q: How much RAM do the services use?
-A: RAM usage varies by service:
-- n8n: ~500MB
-- Ollama: 2-4GB (depends on model)
-- Qdrant: 500MB-1GB
-- PostgreSQL: 500MB
-- Flowise: 500MB
-- Perplexica: 200MB
+### Where is the data stored?
+Data is stored in the following directories under your installation path:
+- `data/postgres`: PostgreSQL data
+- `data/flowise`: Flowise configurations
+- `data/qdrant`: Qdrant vector database
 
-### Q: Can I adjust resource limits?
-A: Yes, you can configure CPU and RAM limits for each service during setup.
+### How do I backup my data?
+1. Stop the containers: `docker-compose down`
+2. Copy the `data` directory to a safe location
+3. Restart the containers: `docker-compose up -d`
+
+### Can I migrate my data to a different machine?
+Yes, you can:
+1. Stop the containers on the old machine
+2. Copy the `data` directory to the new machine
+3. Run the wizard on the new machine using the same configuration
+4. Start the containers
 
 ## Troubleshooting
 
-### Q: Docker containers won't start
-A: Common solutions:
-1. Check if Docker Desktop is running
-2. Verify port availability
-3. Check system resources
-4. Review Docker logs
+### What if a port is already in use?
+You'll need to either:
+1. Stop the service using that port
+2. Change the port mapping in the docker-compose.yml file
 
-### Q: Services are slow
-A: Try:
-1. Increasing resource limits
-2. Reducing the number of running services
-3. Using a GPU for LLM operations
-4. Optimizing database configurations
+### How do I check if the containers are running?
+Run `docker ps` to see all running containers and their status.
 
-### Q: Data persistence issues
-A: Ensure:
-1. Docker volumes are properly configured
-2. Sufficient disk space is available
-3. Proper permissions are set
-4. Regular backups are maintained
+### What if I forget my passwords?
+You can find the passwords in the docker-compose.yml file. For security reasons, consider changing them if they've been exposed.
+
+### How do I view container logs?
+Use `docker-compose logs [service-name]` to view logs for a specific service.
+
+## Updates and Maintenance
+
+### How do I update the components?
+1. Pull the latest images: `docker-compose pull`
+2. Restart the containers: `docker-compose down && docker-compose up -d`
+
+### How often should I update?
+It's recommended to update regularly to get the latest security patches and features. Check the release notes for each component.
+
+### Can I rollback an update?
+Yes, if you've backed up your data and docker-compose.yml file, you can:
+1. Stop the containers
+2. Restore the old configuration and data
+3. Start the containers with the previous version
 
 ## Security
 
-### Q: Is it safe to use in production?
-A: The wizard is designed for local development and testing. For production use:
-1. Configure proper authentication
-2. Set up SSL/TLS
-3. Implement network security
-4. Regular security updates
+### Is it safe to expose these services to the internet?
+The services are configured for local use by default. If you need to expose them:
+1. Set up proper authentication
+2. Use HTTPS/TLS
+3. Configure firewalls appropriately
+4. Regularly update all components
 
-### Q: How are passwords stored?
-A: Passwords are stored in the `.env` file and Docker secrets. Always:
-1. Change default passwords
-2. Use strong passwords
-3. Restrict file permissions
-4. Never share credential files
+### Should I change the default passwords?
+Yes, it's highly recommended to change all default passwords immediately after installation.
 
-## Updates & Maintenance
+### How do I rotate API keys?
+1. Generate a new API key
+2. Update the configuration in docker-compose.yml
+3. Restart the affected service
 
-### Q: How do I update services?
-A: To update:
-1. Pull latest Docker images
-2. Restart services
-3. Check for compatibility
-4. Backup data first
+## Getting Help
 
-### Q: How often should I backup?
-A: Recommended backup schedule:
-1. Database: Daily
-2. Configuration: After changes
-3. Volumes: Weekly
-4. Full system: Monthly
+### Where can I report bugs?
+Open an issue on our GitHub repository with:
+- Detailed description of the problem
+- Steps to reproduce
+- Error messages
+- System information
 
-## Development
+### How can I request new features?
+Submit a feature request on our GitHub repository describing:
+- The feature you'd like to see
+- Why it would be useful
+- Any implementation ideas you have
 
-### Q: Can I contribute to the project?
-A: Yes! See our [CONTRIBUTING.md](CONTRIBUTING.md) guide for:
-1. Development setup
-2. Coding standards
-3. Pull request process
-4. Testing requirements
-
-### Q: Where can I report bugs?
-A: Report bugs on our GitHub Issues page with:
-1. Clear description
-2. Steps to reproduce
-3. System information
-4. Relevant logs
-
-## Support
-
-### Q: Where can I get help?
-A: Support options:
-1. GitHub Issues
-2. Documentation
-3. Community discussions
-4. Stack Overflow tags
-
-### Q: Is commercial support available?
-A: Currently, support is community-driven. Enterprise support options are under consideration.
+### Where can I find the documentation?
+Check our GitHub repository for:
+- README.md: Overview and quick start
+- INSTALLATION.md: Detailed installation guide
+- CONTRIBUTING.md: How to contribute
+- LICENSE: License information

@@ -5,50 +5,43 @@ A user-friendly setup wizard for deploying AI infrastructure components using Do
 ## Features ✨
 
 - 🚀 One-click deployment of AI infrastructure
-- 🔄 Always uses latest stable versions from official sources
+- 🔄 Always uses latest stable versions from Docker Hub
 - 🔐 Service-specific security configuration
-- 🎯 Configurable ports for all services
-- 📊 Resource allocation management
+- 🎯 Configurable installation directory
+- 📊 Docker Compose configuration
 - 🌐 Automatic dependency handling
 
 ## Supported Components 🛠️
 
 | Component | Description | Default Port |
 |-----------|-------------|--------------|
-| n8n | Workflow Automation Platform | 5678 |
-| Ollama | Local LLM Runner | 11434 |
-| OpenWebUI | Ollama Web Interface | 3000 |
-| Qdrant | Vector Database | 6333 |
 | PostgreSQL | Relational Database | 5432 |
-| Flowise | LLM Flow Builder | 3001 |
-| SearXNG | Privacy-focused Search Engine | 8080 |
-| Perplexity | AI Assistant Interface | 3002 |
+| Flowise | LLM Flow Builder | 3000 |
+| Qdrant | Vector Database | 6333, 6334 |
 
 ## Security Features 🔒
 
 Each service has its own security configuration:
 
-- **n8n**: Username/password authentication
-- **PostgreSQL**: Admin credentials
-- **Qdrant**: API key authentication
-- **Flowise**: Admin access control
-- **SearXNG**: Admin password protection
+- **PostgreSQL**: Username, password, and database name
+- **Flowise**: Username and password authentication
+- **Qdrant**: Optional API key authentication
 
 ## Version Management 🔄
 
-The wizard automatically fetches the latest stable versions from:
-- Docker Hub official repositories
-- GitHub releases
-- Package registries
+The wizard automatically fetches the latest stable versions from Docker Hub official repositories:
+- postgres:latest
+- flowise/flowise:latest
+- qdrant/qdrant:latest
 
 This ensures you're always deploying the most recent stable versions of each component.
 
-## Resource Management 💻
+## Data Persistence 💾
 
-- CPU core allocation
-- Memory limits per service
-- Volume management for persistent data
-- Network configuration
+Each service has its own persistent volume:
+- PostgreSQL: `./data/postgres`
+- Flowise: `./data/flowise`
+- Qdrant: `./data/qdrant`
 
 ## Getting Started 🚀
 
@@ -63,40 +56,52 @@ This ensures you're always deploying the most recent stable versions of each com
    npm install
    ```
 
-3. Start the wizard:
+3. Start the wizard in development mode:
    ```bash
-   npm run dev
+   npm run electron:dev
    ```
 
-4. Open http://localhost:5173 in your browser
-
-5. Follow the setup wizard steps:
-   - Select components to install
-   - Configure ports and security
-   - Set resource limits
-   - Review and deploy
+4. Build for production:
+   ```bash
+   npm run electron:build
+   ```
 
 ## Requirements 📋
 
 - Node.js 16+
 - Docker and Docker Compose
-- 8GB RAM minimum (16GB recommended)
-- 4 CPU cores minimum
+- Windows, macOS, or Linux operating system
 
 ## Development 🛠️
 
-- Built with React + TypeScript
+- Built with React + TypeScript + Electron
 - Uses Vite for development
 - Tailwind CSS for styling
 
-To start development server:
+Development commands:
 ```bash
-npm run dev
+# Start development server
+npm run electron:dev
+
+# Build for production
+npm run electron:build
+
+# Run tests
+npm test
 ```
 
-To build for production:
-```bash
-npm run build
+## Project Structure 📁
+
+```
+ai-infrastructure-wizard/
+├── src/                    # Source code
+│   ├── api/               # API handlers
+│   ├── components/        # React components
+│   ├── types/            # TypeScript types
+│   └── utils/            # Utility functions
+├── electron/              # Electron main process
+├── public/               # Static assets
+└── dist/                 # Build output
 ```
 
 ## Contributing 🤝
@@ -113,11 +118,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments 🙏
 
-- [n8n](https://n8n.io/)
-- [Ollama](https://ollama.ai/)
-- [OpenWebUI](https://github.com/open-webui/open-webui)
-- [Qdrant](https://qdrant.tech/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [Flowise](https://flowiseai.com/)
-- [SearXNG](https://docs.searxng.org/)
-- [Perplexity](https://www.perplexity.ai/)
+- [Qdrant](https://qdrant.tech/)

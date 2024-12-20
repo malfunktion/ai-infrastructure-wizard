@@ -6,10 +6,13 @@ interface SecuritySettingsProps {
       n8n: {
         username: string;
         password: string;
+        encryptionKey: string;
+        jwtSecret: string;
       };
       postgres: {
         username: string;
         password: string;
+        database: string;
       };
       qdrant: {
         apiKey: string;
@@ -22,14 +25,15 @@ interface SecuritySettingsProps {
         adminPassword: string;
       };
     };
-    selectedComponents: Record<string, boolean>;
   };
   setConfig: (config: any) => void;
+  selectedComponents: Record<string, boolean>;
 }
 
 export const SecuritySettings: React.FC<SecuritySettingsProps> = ({
   config,
   setConfig,
+  selectedComponents,
 }) => {
   const handleSecurityChange = (
     service: string,
@@ -41,7 +45,7 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({
       security: {
         ...config.security,
         [service]: {
-          ...config.security[service],
+          ...config.security[service as keyof typeof config.security],
           [field]: value,
         },
       },
@@ -49,133 +53,156 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({
   };
 
   return (
-    <div className="space-y-8 p-6">
-      <div className="space-y-6">
-        {config.selectedComponents['n8n'] && (
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">n8n Credentials</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Username</label>
+    <div className="security-settings">
+      <h2>Security Settings</h2>
+      <div className="security-form">
+        {selectedComponents['n8n'] && (
+          <div className="security-section">
+            <h3>n8n</h3>
+            <div className="security-fields">
+              <div className="field-group">
+                <label>Username:</label>
                 <input
                   type="text"
                   value={config.security.n8n.username}
                   onChange={(e) => handleSecurityChange('n8n', 'username', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="n8n admin username"
+                  className="security-input"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="field-group">
+                <label>Password:</label>
                 <input
                   type="password"
                   value={config.security.n8n.password}
                   onChange={(e) => handleSecurityChange('n8n', 'password', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="n8n admin password"
+                  className="security-input"
                 />
+              </div>
+              <div className="field-group">
+                <label>Encryption Key:</label>
+                <input
+                  type="password"
+                  value={config.security.n8n.encryptionKey}
+                  onChange={(e) => handleSecurityChange('n8n', 'encryptionKey', e.target.value)}
+                  className="security-input"
+                  placeholder="N8N_ENCRYPTION_KEY"
+                />
+                <div className="field-description">
+                  Used to encrypt sensitive data in workflows
+                </div>
+              </div>
+              <div className="field-group">
+                <label>JWT Secret:</label>
+                <input
+                  type="password"
+                  value={config.security.n8n.jwtSecret}
+                  onChange={(e) => handleSecurityChange('n8n', 'jwtSecret', e.target.value)}
+                  className="security-input"
+                  placeholder="N8N_USER_MANAGEMENT_JWT_SECRET"
+                />
+                <div className="field-description">
+                  Used for user session management
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {config.selectedComponents['PostgreSQL'] && (
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">PostgreSQL Credentials</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Username</label>
+        {selectedComponents['postgres'] && (
+          <div className="security-section">
+            <h3>PostgreSQL</h3>
+            <div className="security-fields">
+              <div className="field-group">
+                <label>Username:</label>
                 <input
                   type="text"
                   value={config.security.postgres.username}
                   onChange={(e) => handleSecurityChange('postgres', 'username', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="PostgreSQL admin username"
+                  className="security-input"
+                  placeholder="POSTGRES_USER"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="field-group">
+                <label>Password:</label>
                 <input
                   type="password"
                   value={config.security.postgres.password}
                   onChange={(e) => handleSecurityChange('postgres', 'password', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="PostgreSQL admin password"
+                  className="security-input"
+                  placeholder="POSTGRES_PASSWORD"
                 />
+              </div>
+              <div className="field-group">
+                <label>Database:</label>
+                <input
+                  type="text"
+                  value={config.security.postgres.database}
+                  onChange={(e) => handleSecurityChange('postgres', 'database', e.target.value)}
+                  className="security-input"
+                  placeholder="POSTGRES_DB"
+                />
+                <div className="field-description">
+                  Default database that will be created during initialization
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {config.selectedComponents['Qdrant'] && (
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">Qdrant API Key</h3>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">API Key</label>
-              <input
-                type="password"
-                value={config.security.qdrant.apiKey}
-                onChange={(e) => handleSecurityChange('qdrant', 'apiKey', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="Qdrant API key"
-              />
+        {selectedComponents['qdrant'] && (
+          <div className="security-section">
+            <h3>Qdrant</h3>
+            <div className="security-fields">
+              <div className="field-group">
+                <label>API Key:</label>
+                <input
+                  type="password"
+                  value={config.security.qdrant.apiKey}
+                  onChange={(e) => handleSecurityChange('qdrant', 'apiKey', e.target.value)}
+                  className="security-input"
+                  placeholder="QDRANT_API_KEY"
+                />
+                <div className="field-description">
+                  API key for Qdrant authentication (optional for local setups)
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {config.selectedComponents['Flowise'] && (
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">Flowise Credentials</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Username</label>
+        {selectedComponents['flowise'] && (
+          <div className="security-section">
+            <h3>Flowise</h3>
+            <div className="security-fields">
+              <div className="field-group">
+                <label>Username:</label>
                 <input
                   type="text"
                   value={config.security.flowise.username}
                   onChange={(e) => handleSecurityChange('flowise', 'username', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Flowise admin username"
+                  className="security-input"
+                  placeholder="FLOWISE_USERNAME"
                 />
+                <div className="field-description">
+                  Username for accessing the Flowise dashboard
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="field-group">
+                <label>Password:</label>
                 <input
                   type="password"
                   value={config.security.flowise.password}
                   onChange={(e) => handleSecurityChange('flowise', 'password', e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Flowise admin password"
+                  className="security-input"
+                  placeholder="FLOWISE_PASSWORD"
                 />
+                <div className="field-description">
+                  Password for accessing the Flowise dashboard
+                </div>
               </div>
             </div>
           </div>
         )}
-
-        {config.selectedComponents['SearXNG'] && (
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">SearXNG Admin Password</h3>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Admin Password</label>
-              <input
-                type="password"
-                value={config.security.searxng.adminPassword}
-                onChange={(e) => handleSecurityChange('searxng', 'adminPassword', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="SearXNG admin password"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <h4 className="text-sm font-medium text-blue-800 mb-2">Security Tips:</h4>
-        <ul className="text-sm text-blue-600 list-disc list-inside space-y-1">
-          <li>Use strong, unique passwords for each service</li>
-          <li>Store credentials securely - they will be needed for service management</li>
-          <li>Some services may require additional security configuration after setup</li>
-          <li>Consider using a password manager to store these credentials</li>
-        </ul>
       </div>
     </div>
   );

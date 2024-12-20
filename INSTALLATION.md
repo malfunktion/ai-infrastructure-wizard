@@ -1,207 +1,155 @@
 # Installation Guide
 
-This guide provides detailed instructions for installing and configuring the AI Infrastructure Wizard.
+This guide will help you install and run the AI Infrastructure Wizard.
 
-## System Requirements
+## Prerequisites
 
-### Minimum Requirements
-- **CPU**: 2 cores
-- **RAM**: 4GB
-- **Disk Space**: 10GB free
-- **Operating System**: Windows 10/11, macOS, or Linux
-- **Docker**: Docker Desktop 4.0+
-- **Node.js**: v18.0.0 or higher
-- **npm**: v8.0.0 or higher
+Before installing, make sure you have:
 
-### Recommended Requirements
-- **CPU**: 4+ cores
-- **RAM**: 8GB+
-- **Disk Space**: 20GB+ free
-- **GPU**: NVIDIA GPU with CUDA support (for accelerated LLM inference)
+1. **Node.js and npm**
+   - Node.js version 16 or higher
+   - npm version 7 or higher
+   
+2. **Docker and Docker Compose**
+   - Docker version 20.10.0 or higher
+   - Docker Compose version 2.0.0 or higher
+
+3. **Operating System**
+   - Windows 10/11
+   - macOS 10.15 or higher
+   - Linux (Ubuntu 20.04 or higher recommended)
 
 ## Installation Steps
 
-1. **Install Prerequisites**
-
-   a. Install Docker Desktop:
+1. **Clone the Repository**
    ```bash
-   # Windows: Download and install from
-   https://www.docker.com/products/docker-desktop
-
-   # Verify installation
-   docker --version
-   ```
-
-   b. Install Node.js:
-   ```bash
-   # Windows: Download and install from
-   https://nodejs.org/
-
-   # Verify installation
-   node --version
-   npm --version
-   ```
-
-2. **Download and Install**
-
-   ```bash
-   # Clone the repository
    git clone https://github.com/yourusername/ai-infrastructure-wizard.git
    cd ai-infrastructure-wizard
-
-   # Install dependencies
-   npm install
-
-   # Start the application
-   npm run dev
    ```
 
-3. **Configuration**
-
-   The wizard will guide you through:
-   - Installation directory selection
-   - Component selection
-   - Resource allocation
-   - Security settings
-
-## Component Details
-
-### n8n
-- **Purpose**: Workflow automation
-- **Default Port**: 5678
-- **Resource Usage**: Medium
-- **Dependencies**: None
-
-### Ollama
-- **Purpose**: Local LLM runner
-- **Default Port**: 11434
-- **Resource Usage**: High
-- **Dependencies**: CUDA (optional)
-
-### Qdrant
-- **Purpose**: Vector database
-- **Default Port**: 6333
-- **Resource Usage**: Medium
-- **Dependencies**: None
-
-### PostgreSQL
-- **Purpose**: Relational database
-- **Default Port**: 5432
-- **Resource Usage**: Medium
-- **Dependencies**: None
-
-### Flowise (Optional)
-- **Purpose**: LLM flow builder
-- **Default Port**: 3000
-- **Resource Usage**: Medium
-- **Dependencies**: None
-
-### Perplexica (Optional)
-- **Purpose**: AI chat interface
-- **Default Port**: 3001
-- **Resource Usage**: Low
-- **Dependencies**: None
-
-## Post-Installation
-
-1. **Verify Installation**
+2. **Install Dependencies**
    ```bash
-   # Check running containers
-   docker ps
-
-   # Check container logs
-   docker logs ai-n8n-1
+   npm install
    ```
 
-2. **Access Services**
-   - n8n: http://localhost:5678
-   - Flowise: http://localhost:3000
-   - Qdrant: http://localhost:6333
-   - Perplexica: http://localhost:3001
+3. **Development Mode**
+   ```bash
+   npm run electron:dev
+   ```
+   This will:
+   - Start the Vite development server
+   - Launch the Electron application
+   - Enable hot reloading for development
 
-3. **Security**
-   - Change default passwords
-   - Configure firewall rules
-   - Set up SSL if needed
+4. **Production Build**
+   ```bash
+   npm run electron:build
+   ```
+   This will:
+   - Build the React application
+   - Compile the Electron code
+   - Create an installer in the `release` directory
+
+## Verifying Installation
+
+After installation, verify that:
+
+1. **Docker is running**
+   ```bash
+   docker --version
+   docker-compose --version
+   ```
+
+2. **Ports are available**
+   - 5432 (PostgreSQL)
+   - 3000 (Flowise)
+   - 6333, 6334 (Qdrant)
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Docker Issues**
-   - Error: "Docker daemon not running"
-   - Solution: Start Docker Desktop
-   - Error: "Port already in use"
-   - Solution: Change port in configuration
+1. **Port Conflicts**
+   - Error: "port is already allocated"
+   - Solution: Stop any services using the required ports or change the port in docker-compose.yml
 
-2. **Resource Issues**
-   - Error: "Out of memory"
-   - Solution: Increase Docker memory limit
-   - Error: "No space left"
-   - Solution: Free up disk space
+2. **Docker Issues**
+   - Error: "Cannot connect to the Docker daemon"
+   - Solution: Start the Docker service and ensure it's running
 
-3. **Network Issues**
-   - Error: "Connection refused"
-   - Solution: Check firewall settings
-   - Error: "Network timeout"
-   - Solution: Check Docker network settings
+3. **Permission Issues**
+   - Error: "permission denied"
+   - Solution: Run Docker commands with sudo (Linux/macOS) or run as administrator (Windows)
+
+4. **Disk Space**
+   - Error: "no space left on device"
+   - Solution: Free up disk space or change the installation directory
 
 ### Getting Help
 
-1. Check the [FAQ](FAQ.md)
-2. Search existing issues
-3. Create a new issue with:
+If you encounter any issues:
+
+1. Check the [FAQ](FAQ.md) for common problems
+2. Open an issue on GitHub with:
    - Error message
-   - System information
+   - Operating system details
    - Steps to reproduce
 
-## Maintenance
+## Security Notes
 
-1. **Backup**
+1. **Default Credentials**
+   - Change all default passwords immediately after installation
+   - Use strong passwords for all services
+
+2. **API Keys**
+   - Keep the Qdrant API key secure if enabled
+   - Rotate keys periodically
+
+3. **Network Security**
+   - Services are exposed only to localhost by default
+   - Configure firewalls appropriately if exposing to network
+
+## Data Persistence
+
+All data is stored in the `data` directory:
+- `data/postgres`: PostgreSQL data
+- `data/flowise`: Flowise configurations
+- `data/qdrant`: Qdrant vector database
+
+Backup these directories regularly to prevent data loss.
+
+## Updating
+
+To update the wizard:
+
+1. Pull the latest changes
    ```bash
-   # Backup volumes
-   docker volume ls
-   docker volume backup [volume-name]
+   git pull origin main
    ```
 
-2. **Updates**
+2. Install any new dependencies
    ```bash
-   # Pull latest images
-   docker-compose pull
-
-   # Restart services
-   docker-compose down
-   docker-compose up -d
+   npm install
    ```
 
-3. **Monitoring**
+3. Rebuild the application
    ```bash
-   # Check resource usage
-   docker stats
-
-   # View logs
-   docker-compose logs -f
+   npm run electron:build
    ```
 
 ## Uninstallation
 
-1. **Stop Services**
+1. Stop all containers
    ```bash
-   cd [installation-directory]
-   docker-compose down -v
+   docker-compose down
    ```
 
-2. **Remove Files**
+2. Remove data directories (optional)
    ```bash
-   # Remove installation directory
-   rm -rf [installation-directory]
+   rm -rf data
    ```
 
-3. **Clean Docker**
-   ```bash
-   # Remove unused images
-   docker image prune -a
-
-   # Remove unused volumes
-   docker volume prune
-   ```
+3. Uninstall the application
+   - Windows: Use "Add or Remove Programs"
+   - macOS: Move to Trash
+   - Linux: Remove the installation directory

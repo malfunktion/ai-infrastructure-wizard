@@ -1,12 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import systemCheckPlugin from './vite-plugin-system-check'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), systemCheckPlugin()],
+  plugins: [react()],
   server: {
-    port: 5173,
+    port: 8123,
     strictPort: true,
     host: true
   }

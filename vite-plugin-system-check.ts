@@ -1,4 +1,4 @@
-import type { Plugin } from 'vite';
+import { Plugin } from 'vite';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs/promises';
@@ -477,6 +477,30 @@ export default function systemCheckPlugin(): Plugin {
   return {
     name: 'system-check',
     configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url === '/api/system-check') {
+          try {
+            const dockerVersion = await execAsync('docker --version');
+            const dockerComposeVersion = await execAsync('docker compose version');
+            
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({
+              docker: dockerVersion.stdout.trim(),
+              dockerCompose: dockerComposeVersion.stdout.trim(),
+              status: 'ok'
+            }));
+          } catch (error) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({
+              status: 'error',
+              message: error.message
+            }));
+          }
+        } else {
+          next();
+        }
+      });
+
       // Add API endpoint for services management
       server.middlewares.use('/api/services/:action', async (req, res) => {
         if (req.method === 'POST') {
