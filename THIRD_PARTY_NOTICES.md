@@ -40,6 +40,12 @@ This project uses the following third-party software and Docker images. Each has
 - **Source Code**: [https://github.com/searxng/searxng](https://github.com/searxng/searxng)
 - **Documentation**: [https://docs.searxng.org/](https://docs.searxng.org/)
 
+### Perplexity
+- **Official Image**: [ghcr.io/perplexity-ai/online-inference](https://github.com/perplexity-ai/online-inference/pkgs/container/online-inference)
+- **License**: [MIT License](https://github.com/perplexity-ai/online-inference/blob/main/LICENSE)
+- **Source Code**: [https://github.com/perplexity-ai/online-inference](https://github.com/perplexity-ai/online-inference)
+- **Documentation**: [https://perplexity.ai/docs](https://perplexity.ai/docs)
+
 ## Development Dependencies
 
 ### React

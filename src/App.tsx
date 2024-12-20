@@ -60,7 +60,8 @@ function App() {
       qdrant: 6333,
       postgres: 5432,
       flowise: 3001,
-      searxng: 8080
+      searxng: 8080,
+      perplexity: 3002
     },
     cpuCores: 4,
     ramGB: 8,
@@ -75,6 +76,7 @@ function App() {
     'PostgreSQL': true,
     'Flowise': false,
     'SearXNG': true,
+    'Perplexity': true
   });
   const [serviceLinks, setServiceLinks] = useState<ServiceLink[]>([]);
   const [isDeploying, setIsDeploying] = useState(false);
@@ -125,6 +127,13 @@ function App() {
           name: 'SearXNG',
           url: `http://localhost:${config.ports.searxng}`,
           description: 'Decentralized Search Engine'
+        });
+      }
+      if (servicesStatus['Perplexity']) {
+        links.push({
+          name: 'Perplexity',
+          url: `http://localhost:${config.ports.perplexity}`,
+          description: 'Perplexity'
         });
       }
       setServiceLinks(links);
@@ -234,6 +243,21 @@ function App() {
               onChange={(e) => setConfig({
                 ...config,
                 ports: { ...config.ports, searxng: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+
+        {selectedComponents['Perplexity'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Perplexity Port</label>
+            <input
+              type="number"
+              value={config.ports.perplexity}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, perplexity: parseInt(e.target.value) }
               })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />

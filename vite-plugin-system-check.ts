@@ -16,6 +16,7 @@ interface DeploymentConfig {
     postgres: number;
     flowise: number;
     searxng: number;
+    perplexity: number;
   };
   cpuCores: number;
   ramGB: number;
@@ -170,6 +171,30 @@ function generateDockerCompose(config: DeploymentConfig): string {
           memory: 1G`);
   }
 
+  if (config.selectedComponents['Perplexity']) {
+    services.push(`
+  perplexity:
+    image: ghcr.io/perplexity-ai/online-inference:latest
+    container_name: ai-perplexity-1
+    ports:
+      - "${config.ports.perplexity}:3000"
+    environment:
+      - SEARXNG_URL=http://searxng:8080
+      - OLLAMA_API_URL=http://ollama:11434
+      - QDRANT_URL=http://qdrant:6333
+    networks:
+      - ai-network
+    depends_on:
+      - searxng
+      - ollama
+      - qdrant
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G`);
+  }
+
   const volumes = [
     'n8n_data',
     'ollama_data',
@@ -209,6 +234,7 @@ QDRANT_PORT=${config.ports.qdrant}
 POSTGRES_PORT=${config.ports.postgres}
 FLOWISE_PORT=${config.ports.flowise}
 SEARXNG_PORT=${config.ports.searxng}
+PERPLEXITY_PORT=${config.ports.perplexity}
 
 # Resource Limits
 CPU_CORES=${config.cpuCores}
@@ -235,6 +261,9 @@ function generateReadme(config: DeploymentConfig): string {
   }
   if (config.selectedComponents['SearXNG']) {
     services.push(`- SearXNG: http://localhost:${config.ports.searxng}`);
+  }
+  if (config.selectedComponents['Perplexity']) {
+    services.push(`- Perplexity: http://localhost:${config.ports.perplexity}`);
   }
 
   return `# AI Infrastructure Setup
@@ -274,6 +303,7 @@ RAM: ${config.ramGB}GB
 - PostgreSQL: https://www.postgresql.org/docs/
 - Flowise: https://docs.flowiseai.com/
 - SearXNG: https://docs.searxng.org/
+- Perplexity: https://perplexity.ai/docs
 `;
 }
 
@@ -316,6 +346,18 @@ async function validateConfiguration(config: DeploymentConfig): Promise<{ valid:
   }
   if (config.selectedComponents['SearXNG']) {
     requiredPorts.push([config.ports.searxng, 'SearXNG']);
+  }
+  if (config.selectedComponents['Perplexity']) {
+    if (!config.selectedComponents['SearXNG']) {
+      errors.push('Perplexity requires SearXNG to be installed');
+    }
+    if (!config.selectedComponents['Ollama']) {
+      errors.push('Perplexity requires Ollama to be installed');
+    }
+    if (!config.selectedComponents['Qdrant']) {
+      errors.push('Perplexity requires Qdrant to be installed');
+    }
+    requiredPorts.push([config.ports.perplexity, 'Perplexity']);
   }
 
   // Check for port conflicts
