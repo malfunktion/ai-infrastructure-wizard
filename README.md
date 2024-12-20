@@ -13,12 +13,20 @@ A modern web-based wizard for deploying and managing AI infrastructure component
 
 ## Supported Services 🛠️
 
-- **n8n**: Workflow automation platform
-- **Ollama**: Local Large Language Model runner
-- **Qdrant**: Vector database
-- **PostgreSQL**: Relational database
-- **Flowise**: Visual LLM flow builder (optional)
+- **[n8n](https://n8n.io/)**: Workflow automation platform (Fair-Code Licensed)
+- **[Ollama](https://ollama.ai/)**: Local Large Language Model runner (MIT Licensed)
+- **[Qdrant](https://qdrant.tech/)**: Vector database (Apache 2.0 Licensed)
+- **[PostgreSQL](https://www.postgresql.org/)**: Relational database (PostgreSQL License)
+- **[Flowise](https://flowiseai.com/)**: Visual LLM flow builder (Apache 2.0 Licensed)
 - **Perplexica**: AI chat interface (optional)
+
+## Attribution and Licensing 📜
+
+This project is a configuration and deployment tool that uses official Docker images from their respective projects. We do not include or modify any code from these projects. Each component has its own license:
+
+- See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for detailed attribution and license information
+- All Docker images are pulled directly from their official repositories
+- Each service maintains its own licensing terms
 
 ## Prerequisites 📋
 
