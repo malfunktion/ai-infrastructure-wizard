@@ -70,6 +70,9 @@ function generateDockerCompose(config: DeploymentConfig): string {
   }
 
   if (config.selectedComponents['OpenWebUI']) {
+    if (!config.selectedComponents['Ollama']) {
+      throw new Error('OpenWebUI requires Ollama to be installed');
+    }
     services.push(`
   openwebui:
     image: ghcr.io/open-webui/open-webui:main
@@ -85,8 +88,8 @@ function generateDockerCompose(config: DeploymentConfig): string {
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: 2G`);
+          cpus: '1'
+          memory: 1G`);
   }
 
   if (config.selectedComponents['Qdrant']) {
@@ -172,6 +175,15 @@ function generateDockerCompose(config: DeploymentConfig): string {
   }
 
   if (config.selectedComponents['Perplexity']) {
+    if (!config.selectedComponents['SearXNG']) {
+      throw new Error('Perplexity requires SearXNG to be installed');
+    }
+    if (!config.selectedComponents['Ollama']) {
+      throw new Error('Perplexity requires Ollama to be installed');
+    }
+    if (!config.selectedComponents['Qdrant']) {
+      throw new Error('Perplexity requires Qdrant to be installed');
+    }
     services.push(`
   perplexity:
     image: ghcr.io/perplexity-ai/online-inference:latest

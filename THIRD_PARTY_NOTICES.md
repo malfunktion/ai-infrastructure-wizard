@@ -46,6 +46,12 @@ This project uses the following third-party software and Docker images. Each has
 - **Source Code**: [https://github.com/perplexity-ai/online-inference](https://github.com/perplexity-ai/online-inference)
 - **Documentation**: [https://perplexity.ai/docs](https://perplexity.ai/docs)
 
+### OpenWebUI
+- **Official Image**: [ghcr.io/open-webui/open-webui](https://github.com/open-webui/open-webui/pkgs/container/open-webui)
+- **License**: [MIT License](https://github.com/open-webui/open-webui/blob/main/LICENSE)
+- **Source Code**: [https://github.com/open-webui/open-webui](https://github.com/open-webui/open-webui)
+- **Documentation**: [https://docs.openwebui.com/](https://docs.openwebui.com/)
+
 ## Development Dependencies
 
 ### React
