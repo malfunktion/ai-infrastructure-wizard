@@ -8,10 +8,14 @@ const execAsync = promisify(exec);
 
 interface DeploymentConfig {
   installDir: string;
-  n8nPort: number;
-  ollamaPort: number;
-  ollamaWebPort: number;
-  qdrantPort: number;
+  ports: {
+    n8n: number;
+    ollama: number;
+    ollamaWeb: number;
+    qdrant: number;
+    postgres: number;
+    flowise: number;
+  };
   cpuCores: number;
   ramGB: number;
   adminUsername: string;
@@ -29,7 +33,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
     image: n8nio/n8n
     container_name: ai-n8n-1
     ports:
-      - "${config.n8nPort}:5678"
+      - "${config.ports.n8n}:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${config.adminUsername}
@@ -51,7 +55,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
     image: ollama/ollama
     container_name: ai-ollama-1
     ports:
-      - "${config.ollamaPort}:11434"
+      - "${config.ports.ollama}:11434"
     volumes:
       - ollama_data:/root/.ollama
     networks:
@@ -69,7 +73,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
     image: ghcr.io/open-webui/open-webui:main
     container_name: ai-openwebui-1
     ports:
-      - "${config.ollamaWebPort}:8080"
+      - "${config.ports.ollamaWeb}:8080"
     environment:
       - OLLAMA_API_BASE_URL=http://ollama:11434/api
     networks:
@@ -89,7 +93,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
     image: qdrant/qdrant
     container_name: ai-qdrant-1
     ports:
-      - "${config.qdrantPort}:6333"
+      - "${config.ports.qdrant}:6333"
     volumes:
       - qdrant_data:/qdrant/storage
     networks:
@@ -106,6 +110,8 @@ function generateDockerCompose(config: DeploymentConfig): string {
   postgres:
     image: postgres:latest
     container_name: ai-postgres-1
+    ports:
+      - "${config.ports.postgres}:5432"
     environment:
       - POSTGRES_USER=${config.adminUsername}
       - POSTGRES_PASSWORD=${config.adminPassword}
@@ -126,7 +132,7 @@ function generateDockerCompose(config: DeploymentConfig): string {
     image: flowiseai/flowise
     container_name: ai-flowise-1
     ports:
-      - "3000:3000"
+      - "${config.ports.flowise}:3000"
     environment:
       - USERNAME=${config.adminUsername}
       - PASSWORD=${config.adminPassword}
@@ -172,10 +178,12 @@ ADMIN_USERNAME=${config.adminUsername}
 ADMIN_PASSWORD=${config.adminPassword}
 
 # Port Configuration
-N8N_PORT=${config.n8nPort}
-OLLAMA_PORT=${config.ollamaPort}
-OLLAMA_WEB_PORT=${config.ollamaWebPort}
-QDRANT_PORT=${config.qdrantPort}
+N8N_PORT=${config.ports.n8n}
+OLLAMA_PORT=${config.ports.ollama}
+OLLAMA_WEB_PORT=${config.ports.ollamaWeb}
+QDRANT_PORT=${config.ports.qdrant}
+POSTGRES_PORT=${config.ports.postgres}
+FLOWISE_PORT=${config.ports.flowise}
 
 # Resource Limits
 CPU_CORES=${config.cpuCores}
@@ -186,19 +194,19 @@ function generateReadme(config: DeploymentConfig): string {
   const services = [];
   
   if (config.selectedComponents['n8n']) {
-    services.push(`- n8n: http://localhost:${config.n8nPort}`);
+    services.push(`- n8n: http://localhost:${config.ports.n8n}`);
   }
   if (config.selectedComponents['Ollama']) {
-    services.push(`- Ollama API: http://localhost:${config.ollamaPort}`);
+    services.push(`- Ollama API: http://localhost:${config.ports.ollama}`);
   }
   if (config.selectedComponents['OpenWebUI']) {
-    services.push(`- Ollama Web UI: http://localhost:${config.ollamaWebPort}`);
+    services.push(`- Ollama Web UI: http://localhost:${config.ports.ollamaWeb}`);
   }
   if (config.selectedComponents['Qdrant']) {
-    services.push(`- Qdrant: http://localhost:${config.qdrantPort}`);
+    services.push(`- Qdrant: http://localhost:${config.ports.qdrant}`);
   }
   if (config.selectedComponents['Flowise']) {
-    services.push(`- Flowise: http://localhost:3000`);
+    services.push(`- Flowise: http://localhost:${config.ports.flowise}`);
   }
 
   return `# AI Infrastructure Setup
@@ -256,22 +264,25 @@ async function validateConfiguration(config: DeploymentConfig): Promise<{ valid:
 
   // Collect required ports based on selected components
   if (config.selectedComponents['n8n']) {
-    requiredPorts.push([config.n8nPort, 'n8n']);
+    requiredPorts.push([config.ports.n8n, 'n8n']);
   }
   if (config.selectedComponents['Ollama']) {
-    requiredPorts.push([config.ollamaPort, 'Ollama']);
+    requiredPorts.push([config.ports.ollama, 'Ollama']);
   }
   if (config.selectedComponents['OpenWebUI']) {
     if (!config.selectedComponents['Ollama']) {
       errors.push('OpenWebUI requires Ollama to be installed');
     }
-    requiredPorts.push([config.ollamaWebPort, 'OpenWebUI']);
+    requiredPorts.push([config.ports.ollamaWeb, 'OpenWebUI']);
   }
   if (config.selectedComponents['Qdrant']) {
-    requiredPorts.push([config.qdrantPort, 'Qdrant']);
+    requiredPorts.push([config.ports.qdrant, 'Qdrant']);
+  }
+  if (config.selectedComponents['PostgreSQL']) {
+    requiredPorts.push([config.ports.postgres, 'PostgreSQL']);
   }
   if (config.selectedComponents['Flowise']) {
-    requiredPorts.push([3000, 'Flowise']);
+    requiredPorts.push([config.ports.flowise, 'Flowise']);
   }
 
   // Check for port conflicts

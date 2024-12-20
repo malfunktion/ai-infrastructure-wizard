@@ -53,10 +53,14 @@ function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [config, setConfig] = useState({
     installDir: 'C:\\AI',
-    n8nPort: 5678,
-    ollamaPort: 11434,
-    ollamaWebPort: 3000,
-    qdrantPort: 6333,
+    ports: {
+      n8n: 5678,
+      ollama: 11434,
+      ollamaWeb: 3000,
+      qdrant: 6333,
+      postgres: 5432,
+      flowise: 3001
+    },
     cpuCores: 4,
     ramGB: 8,
     adminUsername: '',
@@ -82,35 +86,35 @@ function App() {
       if (servicesStatus['n8n']) {
         links.push({
           name: 'n8n',
-          url: `http://localhost:${config.n8nPort}`,
+          url: `http://localhost:${config.ports.n8n}`,
           description: 'Workflow Automation Platform'
         });
       }
       if (servicesStatus['Ollama']) {
         links.push({
           name: 'Ollama API',
-          url: `http://localhost:${config.ollamaPort}`,
+          url: `http://localhost:${config.ports.ollama}`,
           description: 'Local LLM API'
         });
       }
       if (servicesStatus['OpenWebUI']) {
         links.push({
           name: 'Ollama Web UI',
-          url: `http://localhost:${config.ollamaWebPort}`,
+          url: `http://localhost:${config.ports.ollamaWeb}`,
           description: 'Ollama Web Interface'
         });
       }
       if (servicesStatus['Qdrant']) {
         links.push({
           name: 'Qdrant',
-          url: `http://localhost:${config.qdrantPort}`,
+          url: `http://localhost:${config.ports.qdrant}`,
           description: 'Vector Database'
         });
       }
       if (servicesStatus['Flowise']) {
         links.push({
           name: 'Flowise',
-          url: 'http://localhost:3000',
+          url: `http://localhost:${config.ports.flowise}`,
           description: 'LLM Flow Builder'
         });
       }
@@ -118,35 +122,185 @@ function App() {
     }
   }, [servicesStatus, config]);
 
-  // ... rest of your existing code ...
+  const PortConfiguration = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Port Configuration</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {selectedComponents['n8n'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">n8n Port</label>
+            <input
+              type="number"
+              value={config.ports.n8n}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, n8n: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+        
+        {selectedComponents['Ollama'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Ollama API Port</label>
+            <input
+              type="number"
+              value={config.ports.ollama}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, ollama: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+
+        {selectedComponents['OpenWebUI'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Ollama Web UI Port</label>
+            <input
+              type="number"
+              value={config.ports.ollamaWeb}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, ollamaWeb: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+
+        {selectedComponents['Qdrant'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Qdrant Port</label>
+            <input
+              type="number"
+              value={config.ports.qdrant}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, qdrant: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+
+        {selectedComponents['PostgreSQL'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">PostgreSQL Port</label>
+            <input
+              type="number"
+              value={config.ports.postgres}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, postgres: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+
+        {selectedComponents['Flowise'] && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Flowise Port</label>
+            <input
+              type="number"
+              value={config.ports.flowise}
+              onChange={(e) => setConfig({
+                ...config,
+                ports: { ...config.ports, flowise: parseInt(e.target.value) }
+              })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        )}
+      </div>
+      <p className="text-sm text-gray-500 mt-2">
+        Make sure each port is unique and not in use by other applications.
+      </p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto py-8">
         <div className="bg-white shadow-lg rounded-lg p-6">
-          {/* ... existing wizard steps ... */}
-
-          {serviceLinks.length > 0 && (
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-              <h3 className="text-lg font-medium text-blue-800 mb-4">Available Services</h3>
-              <div className="grid gap-4 md:grid-cols-2">
-                {serviceLinks.map((service) => (
-                  <a
-                    key={service.name}
-                    href={service.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div>
-                      <h4 className="font-medium text-gray-900">{service.name}</h4>
-                      <p className="text-sm text-gray-500">{service.description}</p>
-                      <span className="text-xs text-blue-600">{service.url}</span>
-                    </div>
-                  </a>
-                ))}
+          <StepIndicator steps={steps} currentStep={currentStep} />
+          
+          {currentStep === 0 && (
+            <WizardStep step={steps[0]} isActive={true}>
+              <div className="prose">
+                <p>Welcome to the AI Infrastructure Wizard! This tool will help you set up your self-hosted AI infrastructure.</p>
+                <p>We'll guide you through:</p>
+                <ul>
+                  <li>System requirements check</li>
+                  <li>Component selection</li>
+                  <li>Port configuration</li>
+                  <li>Resource allocation</li>
+                  <li>Security settings</li>
+                </ul>
               </div>
-            </div>
+            </WizardStep>
+          )}
+
+          {currentStep === 1 && (
+            <WizardStep step={steps[1]} isActive={true}>
+              <SystemRequirements />
+            </WizardStep>
+          )}
+
+          {currentStep === 2 && (
+            <WizardStep step={steps[2]} isActive={true}>
+              <ComponentSelection
+                selectedComponents={selectedComponents}
+                setSelectedComponents={setSelectedComponents}
+              />
+            </WizardStep>
+          )}
+
+          {currentStep === 3 && (
+            <WizardStep step={steps[3]} isActive={true}>
+              <div className="space-y-8">
+                <InstallationDirectory
+                  config={config}
+                  setConfig={setConfig}
+                />
+                <PortConfiguration />
+              </div>
+            </WizardStep>
+          )}
+
+          {currentStep === 4 && (
+            <WizardStep step={steps[4]} isActive={true}>
+              <ResourceAllocation
+                config={config}
+                setConfig={setConfig}
+              />
+            </WizardStep>
+          )}
+
+          {currentStep === 5 && (
+            <WizardStep step={steps[5]} isActive={true}>
+              <SecuritySettings
+                config={config}
+                setConfig={setConfig}
+              />
+            </WizardStep>
+          )}
+
+          {currentStep === 6 && (
+            <WizardStep step={steps[6]} isActive={true}>
+              <ReviewAndDeploy
+                config={config}
+                isDeploying={isDeploying}
+                setIsDeploying={setIsDeploying}
+                deploymentStatus={deploymentStatus}
+                setDeploymentStatus={setDeploymentStatus}
+                launchAfterDeploy={launchAfterDeploy}
+                setLaunchAfterDeploy={setLaunchAfterDeploy}
+              />
+            </WizardStep>
           )}
         </div>
       </div>
