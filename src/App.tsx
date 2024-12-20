@@ -65,6 +65,26 @@ function App() {
     },
     cpuCores: 4,
     ramGB: 8,
+    security: {
+      n8n: {
+        username: '',
+        password: ''
+      },
+      postgres: {
+        username: '',
+        password: ''
+      },
+      qdrant: {
+        apiKey: ''
+      },
+      flowise: {
+        username: '',
+        password: ''
+      },
+      searxng: {
+        adminPassword: ''
+      }
+    },
     adminUsername: '',
     adminPassword: '',
   });

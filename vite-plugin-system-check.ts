@@ -23,6 +23,26 @@ interface DeploymentConfig {
   adminUsername: string;
   adminPassword: string;
   selectedComponents: Record<string, boolean>;
+  security: {
+    n8n: {
+      username: string;
+      password: string;
+    };
+    postgres: {
+      username: string;
+      password: string;
+    };
+    qdrant: {
+      apiKey: string;
+    };
+    flowise: {
+      username: string;
+      password: string;
+    };
+    searxng: {
+      adminPassword: string;
+    };
+  };
 }
 
 function generateDockerCompose(config: DeploymentConfig): string {
@@ -32,23 +52,23 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['n8n']) {
     services.push(`
   n8n:
-    image: n8nio/n8n
+    image: n8nio/n8n:latest
     container_name: ai-n8n-1
     ports:
       - "${config.ports.n8n}:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${config.adminUsername}
-      - N8N_BASIC_AUTH_PASSWORD=${config.adminPassword}
-    volumes:
-      - n8n_data:/home/node/.n8n
+      - N8N_BASIC_AUTH_USER=${config.security.n8n.username}
+      - N8N_BASIC_AUTH_PASSWORD=${config.security.n8n.password}
     networks:
       - ai-network
+    volumes:
+      - n8n_data:/home/node/.n8n
     deploy:
       resources:
         limits:
-          cpus: '${config.cpuCores}'
-          memory: ${config.ramGB}G`);
+          cpus: '2'
+          memory: 4G`);
   }
 
   if (config.selectedComponents['Ollama']) {
@@ -95,19 +115,21 @@ function generateDockerCompose(config: DeploymentConfig): string {
   if (config.selectedComponents['Qdrant']) {
     services.push(`
   qdrant:
-    image: qdrant/qdrant
+    image: qdrant/qdrant:latest
     container_name: ai-qdrant-1
     ports:
       - "${config.ports.qdrant}:6333"
-    volumes:
-      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT_API_KEY=${config.security.qdrant.apiKey}
     networks:
       - ai-network
+    volumes:
+      - qdrant_data:/qdrant/storage
     deploy:
       resources:
         limits:
-          cpus: '${config.cpuCores}'
-          memory: ${config.ramGB}G`);
+          cpus: '2'
+          memory: 4G`);
   }
 
   if (config.selectedComponents['PostgreSQL']) {
@@ -118,55 +140,53 @@ function generateDockerCompose(config: DeploymentConfig): string {
     ports:
       - "${config.ports.postgres}:5432"
     environment:
-      - POSTGRES_USER=${config.adminUsername}
-      - POSTGRES_PASSWORD=${config.adminPassword}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - POSTGRES_USER=${config.security.postgres.username}
+      - POSTGRES_PASSWORD=${config.security.postgres.password}
     networks:
       - ai-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: '1'
           memory: 2G`);
   }
 
   if (config.selectedComponents['Flowise']) {
     services.push(`
   flowise:
-    image: flowiseai/flowise
+    image: flowiseai/flowise:latest
     container_name: ai-flowise-1
     ports:
       - "${config.ports.flowise}:3000"
     environment:
-      - USERNAME=${config.adminUsername}
-      - PASSWORD=${config.adminPassword}
-    volumes:
-      - flowise_data:/root/.flowise
+      - FLOWISE_USERNAME=${config.security.flowise.username}
+      - FLOWISE_PASSWORD=${config.security.flowise.password}
     networks:
       - ai-network
+    volumes:
+      - flowise_data:/root/.flowise
     deploy:
       resources:
         limits:
-          cpus: '${config.cpuCores}'
-          memory: ${config.ramGB}G`);
+          cpus: '2'
+          memory: 4G`);
   }
 
   if (config.selectedComponents['SearXNG']) {
     services.push(`
   searxng:
-    image: searxng/searxng
+    image: searxng/searxng:latest
     container_name: ai-searxng-1
     ports:
       - "${config.ports.searxng}:8080"
-    volumes:
-      - searxng_data:/etc/searxng
     environment:
-      - SEARXNG_BASE_URL=http://localhost:${config.ports.searxng}/
-      - SEARXNG_HOSTNAME=ai-searxng-1
-      - SEARXNG_SECRET=${config.adminPassword}
+      - SEARXNG_ADMIN_PASSWORD=${config.security.searxng.adminPassword}
     networks:
       - ai-network
+    volumes:
+      - searxng_data:/etc/searxng
     deploy:
       resources:
         limits:
@@ -417,9 +437,9 @@ async function validateConfiguration(config: DeploymentConfig): Promise<{ valid:
 
   // Validate resource limits
   try {
-    const { stdout: dockerInfo } = await execAsync('docker info');
-    const cpuMatch = dockerInfo.match(/CPUs: (\d+)/);
-    const memMatch = dockerInfo.match(/Total Memory: (\d+(\.\d+)?)/);
+    const { stdout } = await execAsync('docker info');
+    const cpuMatch = stdout.match(/CPUs: (\d+)/);
+    const memMatch = stdout.match(/Total Memory: (\d+(\.\d+)?)/);
     
     if (cpuMatch) {
       const totalCPUs = parseInt(cpuMatch[1]);
