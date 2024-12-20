@@ -239,6 +239,113 @@ RAM: ${config.ramGB}GB
 - Flowise: https://docs.flowiseai.com/`;
 }
 
+async function checkPortAvailable(port: number): Promise<boolean> {
+  try {
+    const { stdout } = await execAsync(`netstat -ano | findstr :${port}`);
+    return !stdout.trim(); // Port is available if no output
+  } catch (error) {
+    // If command fails (no process using the port), port is available
+    return true;
+  }
+}
+
+async function validateConfiguration(config: DeploymentConfig): Promise<{ valid: boolean; errors: string[] }> {
+  const errors: string[] = [];
+  const usedPorts = new Set<number>();
+  const requiredPorts: [number, string][] = [];
+
+  // Collect required ports based on selected components
+  if (config.selectedComponents['n8n']) {
+    requiredPorts.push([config.n8nPort, 'n8n']);
+  }
+  if (config.selectedComponents['Ollama']) {
+    requiredPorts.push([config.ollamaPort, 'Ollama']);
+  }
+  if (config.selectedComponents['OpenWebUI']) {
+    if (!config.selectedComponents['Ollama']) {
+      errors.push('OpenWebUI requires Ollama to be installed');
+    }
+    requiredPorts.push([config.ollamaWebPort, 'OpenWebUI']);
+  }
+  if (config.selectedComponents['Qdrant']) {
+    requiredPorts.push([config.qdrantPort, 'Qdrant']);
+  }
+  if (config.selectedComponents['Flowise']) {
+    requiredPorts.push([3000, 'Flowise']);
+  }
+
+  // Check for port conflicts
+  for (const [port, service] of requiredPorts) {
+    if (usedPorts.has(port)) {
+      errors.push(`Port conflict: ${port} is used by multiple services`);
+    }
+    usedPorts.add(port);
+
+    const isAvailable = await checkPortAvailable(port);
+    if (!isAvailable) {
+      errors.push(`Port ${port} required by ${service} is already in use`);
+    }
+  }
+
+  // Validate installation directory
+  try {
+    await fs.access(config.installDir);
+    const stats = await fs.stat(config.installDir);
+    if (!stats.isDirectory()) {
+      errors.push('Installation path exists but is not a directory');
+    }
+  } catch {
+    try {
+      await fs.mkdir(config.installDir, { recursive: true });
+    } catch (error) {
+      errors.push(`Cannot create installation directory: ${error.message}`);
+    }
+  }
+
+  // Validate Docker network
+  try {
+    const { stdout } = await execAsync('docker network ls');
+    if (stdout.includes('ai-network')) {
+      // Check if network is in use
+      const { stdout: networkInfo } = await execAsync('docker network inspect ai-network');
+      const networkData = JSON.parse(networkInfo);
+      if (networkData[0].Containers && Object.keys(networkData[0].Containers).length > 0) {
+        errors.push('Docker network "ai-network" is already in use by other containers');
+      }
+    }
+  } catch (error) {
+    errors.push('Failed to check Docker network status');
+  }
+
+  // Validate resource limits
+  try {
+    const { stdout: dockerInfo } = await execAsync('docker info');
+    const cpuMatch = dockerInfo.match(/CPUs: (\d+)/);
+    const memMatch = dockerInfo.match(/Total Memory: (\d+(\.\d+)?)/);
+    
+    if (cpuMatch) {
+      const totalCPUs = parseInt(cpuMatch[1]);
+      if (config.cpuCores > totalCPUs) {
+        errors.push(`Requested CPU cores (${config.cpuCores}) exceed available CPUs (${totalCPUs})`);
+      }
+    }
+    
+    if (memMatch) {
+      const totalMemGB = parseFloat(memMatch[1]) / 1024; // Convert to GB
+      if (config.ramGB > totalMemGB) {
+        errors.push(`Requested RAM (${config.ramGB}GB) exceeds available memory (${totalMemGB.toFixed(1)}GB)`);
+      }
+    }
+  } catch (error) {
+    errors.push('Failed to validate system resources');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export default function systemCheckPlugin(): Plugin {
   return {
     name: 'system-check',
@@ -308,6 +415,12 @@ export default function systemCheckPlugin(): Plugin {
             try {
               const { config, launchServices } = JSON.parse(body);
               console.log('Received deployment request:', { config, launchServices });
+
+              // Validate configuration before proceeding
+              const validation = await validateConfiguration(config);
+              if (!validation.valid) {
+                throw new Error(`Configuration validation failed:\n${validation.errors.join('\n')}`);
+              }
 
               if (!config || !config.installDir) {
                 throw new Error('Invalid configuration: missing installation directory');
