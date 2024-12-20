@@ -140,136 +140,6 @@ function App() {
     }
   }, [servicesStatus, config]);
 
-  const PortConfiguration = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Port Configuration</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {selectedComponents['n8n'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">n8n Port</label>
-            <input
-              type="number"
-              value={config.ports.n8n}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, n8n: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-        
-        {selectedComponents['Ollama'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Ollama API Port</label>
-            <input
-              type="number"
-              value={config.ports.ollama}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, ollama: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-
-        {selectedComponents['OpenWebUI'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Ollama Web UI Port</label>
-            <input
-              type="number"
-              value={config.ports.ollamaWeb}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, ollamaWeb: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-
-        {selectedComponents['Qdrant'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Qdrant Port</label>
-            <input
-              type="number"
-              value={config.ports.qdrant}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, qdrant: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-
-        {selectedComponents['PostgreSQL'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">PostgreSQL Port</label>
-            <input
-              type="number"
-              value={config.ports.postgres}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, postgres: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-
-        {selectedComponents['Flowise'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Flowise Port</label>
-            <input
-              type="number"
-              value={config.ports.flowise}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, flowise: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-
-        {selectedComponents['SearXNG'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">SearXNG Port</label>
-            <input
-              type="number"
-              value={config.ports.searxng}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, searxng: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-
-        {selectedComponents['Perplexity'] && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Perplexity Port</label>
-            <input
-              type="number"
-              value={config.ports.perplexity}
-              onChange={(e) => setConfig({
-                ...config,
-                ports: { ...config.ports, perplexity: parseInt(e.target.value) }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        )}
-      </div>
-      <p className="text-sm text-gray-500 mt-2">
-        Make sure each port is unique and not in use by other applications.
-      </p>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto py-8">
@@ -300,28 +170,106 @@ function App() {
 
           {currentStep === 2 && (
             <WizardStep step={steps[2]} isActive={true}>
-              <ComponentSelection
-                selectedComponents={selectedComponents}
-                setSelectedComponents={setSelectedComponents}
-              />
+              <div className="space-y-8 p-6">
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Select Components</h2>
+                  <ComponentSelection
+                    selectedComponents={selectedComponents}
+                    setSelectedComponents={setSelectedComponents}
+                    config={config}
+                    setConfig={setConfig}
+                  />
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Installation Directory</h2>
+                  <input
+                    type="text"
+                    value={config.installDir}
+                    onChange={(e) => setConfig({ ...config, installDir: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Resource Configuration</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">CPU Cores</label>
+                      <input
+                        type="number"
+                        value={config.cpuCores}
+                        onChange={(e) => setConfig({ ...config, cpuCores: parseInt(e.target.value) })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        min="1"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">RAM (GB)</label>
+                      <input
+                        type="number"
+                        value={config.ramGB}
+                        onChange={(e) => setConfig({ ...config, ramGB: parseInt(e.target.value) })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Admin Credentials</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Username</label>
+                      <input
+                        type="text"
+                        value={config.adminUsername}
+                        onChange={(e) => setConfig({ ...config, adminUsername: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Password</label>
+                      <input
+                        type="password"
+                        value={config.adminPassword}
+                        onChange={(e) => setConfig({ ...config, adminPassword: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleDeploy}
+                    disabled={isDeploying}
+                    className={`px-4 py-2 rounded ${
+                      isDeploying
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-blue-500 hover:bg-blue-600'
+                    } text-white`}
+                  >
+                    {isDeploying ? 'Deploying...' : 'Deploy'}
+                  </button>
+                </div>
+              </div>
             </WizardStep>
           )}
 
           {currentStep === 3 && (
             <WizardStep step={steps[3]} isActive={true}>
-              <div className="space-y-8">
-                <InstallationDirectory
-                  config={config}
-                  setConfig={setConfig}
-                />
-                <PortConfiguration />
-              </div>
+              <ResourceAllocation
+                config={config}
+                setConfig={setConfig}
+              />
             </WizardStep>
           )}
 
           {currentStep === 4 && (
             <WizardStep step={steps[4]} isActive={true}>
-              <ResourceAllocation
+              <SecuritySettings
                 config={config}
                 setConfig={setConfig}
               />
@@ -330,15 +278,6 @@ function App() {
 
           {currentStep === 5 && (
             <WizardStep step={steps[5]} isActive={true}>
-              <SecuritySettings
-                config={config}
-                setConfig={setConfig}
-              />
-            </WizardStep>
-          )}
-
-          {currentStep === 6 && (
-            <WizardStep step={steps[6]} isActive={true}>
               <ReviewAndDeploy
                 config={config}
                 isDeploying={isDeploying}
