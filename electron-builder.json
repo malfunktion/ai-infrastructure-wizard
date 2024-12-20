@@ -1,6 +1,6 @@
 {
-  "appId": "com.codeium.ai-infrastructure-wizard",
-  "productName": "AI Infrastructure Wizard",
+  "appId": "com.codeium.ai-setup-wizard",
+  "productName": "AI Setup Wizard",
   "directories": {
     "output": "release"
   },

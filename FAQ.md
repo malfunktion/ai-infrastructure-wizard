@@ -2,8 +2,8 @@
 
 ## General Questions
 
-### What is the AI Infrastructure Wizard?
-The AI Infrastructure Wizard is a desktop application that helps you deploy and configure AI-related services using Docker containers. It provides a user-friendly interface to set up PostgreSQL, Flowise, and Qdrant.
+### What is the AI Setup Wizard?
+The AI Setup Wizard is a desktop application that helps you deploy and configure AI-related services using Docker containers. It provides a user-friendly interface to set up PostgreSQL, Flowise, and Qdrant.
 
 ### Do I need technical knowledge to use this?
 Basic familiarity with Docker is helpful, but the wizard is designed to be user-friendly and guides you through the setup process step by step.

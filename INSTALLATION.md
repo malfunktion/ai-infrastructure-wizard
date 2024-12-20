@@ -1,6 +1,6 @@
 # Installation Guide
 
-This guide will help you install and run the AI Infrastructure Wizard.
+This guide will help you install and run the AI Setup Wizard.
 
 ## Prerequisites
 

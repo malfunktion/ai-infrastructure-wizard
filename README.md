@@ -1,4 +1,4 @@
-# AI Infrastructure Wizard 🧙‍♂️
+# AI Setup Wizard 🧙‍♂️
 
 A user-friendly setup wizard for deploying AI infrastructure components using Docker.
 
