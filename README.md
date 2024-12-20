@@ -1,42 +1,56 @@
-# AI Infrastructure Wizard 🚀
+# AI Infrastructure Wizard 🧙‍♂️
 
-A modern web-based wizard for deploying and managing AI infrastructure components using Docker. This tool helps you quickly set up and manage various AI-related services like n8n, Ollama, Qdrant, and more.
+A user-friendly setup wizard for deploying AI infrastructure components using Docker.
 
 ## Features ✨
 
-- 🧙‍♂️ Interactive setup wizard
-- 🐳 Docker-based deployment
-- 🔄 Real-time service status monitoring
-- 🎛️ Resource allocation management
-- 🔐 Secure configuration
-- 📊 System requirement checks
+- 🚀 One-click deployment of AI infrastructure
+- 🔄 Always uses latest stable versions from official sources
+- 🔐 Service-specific security configuration
+- 🎯 Configurable ports for all services
+- 📊 Resource allocation management
+- 🌐 Automatic dependency handling
 
-## Supported Services 🛠️
+## Supported Components 🛠️
 
-- **[n8n](https://n8n.io/)**: Workflow automation platform (Fair-Code Licensed)
-- **[Ollama](https://ollama.ai/)**: Local Large Language Model runner (MIT Licensed)
-- **[Qdrant](https://qdrant.tech/)**: Vector database (Apache 2.0 Licensed)
-- **[PostgreSQL](https://www.postgresql.org/)**: Relational database (PostgreSQL License)
-- **[Flowise](https://flowiseai.com/)**: Visual LLM flow builder (Apache 2.0 Licensed)
-- **Perplexica**: AI chat interface (optional)
+| Component | Description | Default Port |
+|-----------|-------------|--------------|
+| n8n | Workflow Automation Platform | 5678 |
+| Ollama | Local LLM Runner | 11434 |
+| OpenWebUI | Ollama Web Interface | 3000 |
+| Qdrant | Vector Database | 6333 |
+| PostgreSQL | Relational Database | 5432 |
+| Flowise | LLM Flow Builder | 3001 |
+| SearXNG | Privacy-focused Search Engine | 8080 |
+| Perplexity | AI Assistant Interface | 3002 |
 
-## Attribution and Licensing 📜
+## Security Features 🔒
 
-This project is a configuration and deployment tool that uses official Docker images from their respective projects. We do not include or modify any code from these projects. Each component has its own license:
+Each service has its own security configuration:
 
-- See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for detailed attribution and license information
-- All Docker images are pulled directly from their official repositories
-- Each service maintains its own licensing terms
+- **n8n**: Username/password authentication
+- **PostgreSQL**: Admin credentials
+- **Qdrant**: API key authentication
+- **Flowise**: Admin access control
+- **SearXNG**: Admin password protection
 
-## Prerequisites 📋
+## Version Management 🔄
 
-- Node.js 18+
-- Docker Desktop
-- Git
-- 10GB+ free disk space
-- (Optional) NVIDIA GPU for accelerated LLM inference
+The wizard automatically fetches the latest stable versions from:
+- Docker Hub official repositories
+- GitHub releases
+- Package registries
 
-## Quick Start 🚀
+This ensures you're always deploying the most recent stable versions of each component.
+
+## Resource Management 💻
+
+- CPU core allocation
+- Memory limits per service
+- Volume management for persistent data
+- Network configuration
+
+## Getting Started 🚀
 
 1. Clone the repository:
    ```bash
@@ -49,113 +63,49 @@ This project is a configuration and deployment tool that uses official Docker im
    npm install
    ```
 
-3. Start the development server:
+3. Start the wizard:
    ```bash
    npm run dev
    ```
 
-4. Open your browser and navigate to:
-   ```
-   http://localhost:5173
-   ```
+4. Open http://localhost:5173 in your browser
 
-## Usage Guide 📖
+5. Follow the setup wizard steps:
+   - Select components to install
+   - Configure ports and security
+   - Set resource limits
+   - Review and deploy
 
-1. **System Check**
-   - The wizard will first check your system requirements
-   - Ensures Docker is running
-   - Verifies available disk space
-   - Checks for NVIDIA GPU (optional)
+## Requirements 📋
 
-2. **Component Selection**
-   - Choose which services you want to deploy
-   - Required components are pre-selected
-   - Optional components can be toggled
-
-3. **Configuration**
-   - Set installation directory
-   - Configure ports
-   - Set resource limits (CPU/RAM)
-   - Configure admin credentials
-
-4. **Review & Deploy**
-   - Review your configuration
-   - Option to launch services after deployment
-   - Real-time deployment status
-   - Service status monitoring
+- Node.js 16+
+- Docker and Docker Compose
+- 8GB RAM minimum (16GB recommended)
+- 4 CPU cores minimum
 
 ## Development 🛠️
 
-### Project Structure
-```
-ai-infrastructure-wizard/
-├── src/
-│   ├── components/
-│   ├── App.tsx
-│   └── main.tsx
-├── vite-plugin-system-check.ts
-├── package.json
-└── vite.config.ts
+- Built with React + TypeScript
+- Uses Vite for development
+- Tailwind CSS for styling
+
+To start development server:
+```bash
+npm run dev
 ```
 
-### Building for Production
+To build for production:
 ```bash
 npm run build
 ```
 
-### Running Tests
-```bash
-npm test
-```
-
-## Configuration Options ⚙️
-
-### Environment Variables
-Create a `.env` file in the root directory:
-```env
-VITE_DEFAULT_INSTALL_DIR=C:\\AI
-VITE_DEFAULT_N8N_PORT=5678
-VITE_DEFAULT_CPU_CORES=4
-VITE_DEFAULT_RAM_GB=8
-```
-
-### Docker Compose
-The generated `docker-compose.yml` includes:
-- Service definitions
-- Port mappings
-- Volume mounts
-- Resource limits
-- Network configuration
-
-## Troubleshooting 🔧
-
-### Common Issues
-
-1. **Docker not running**
-   - Ensure Docker Desktop is running
-   - Check Docker service status
-   - Verify Docker permissions
-
-2. **Port conflicts**
-   - Check if ports are already in use
-   - Configure different ports in the wizard
-
-3. **Resource limits**
-   - Adjust CPU/RAM allocation
-   - Check Docker resource settings
-
-### Getting Help
-- Open an issue on GitHub
-- Check existing issues
-- Read the documentation
-
 ## Contributing 🤝
 
 1. Fork the repository
-2. Create a feature branch
+2. Create your feature branch
 3. Commit your changes
 4. Push to the branch
-5. Open a Pull Request
+5. Create a Pull Request
 
 ## License 📄
 
@@ -163,14 +113,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments 🙏
 
-- Built with React + Vite
-- Uses TailwindCSS for styling
-- Docker for containerization
-- All the amazing open-source projects we integrate with
-
-## Security 🔒
-
-- No sensitive data is stored
-- Credentials are only used for service configuration
-- All communication is local
-- Docker provides container isolation
+- [n8n](https://n8n.io/)
+- [Ollama](https://ollama.ai/)
+- [OpenWebUI](https://github.com/open-webui/open-webui)
+- [Qdrant](https://qdrant.tech/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Flowise](https://flowiseai.com/)
+- [SearXNG](https://docs.searxng.org/)
+- [Perplexity](https://www.perplexity.ai/)
